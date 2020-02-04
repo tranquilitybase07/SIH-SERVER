@@ -56,17 +56,29 @@ router.post("/getbillbydate", (req, res) => {
 });
 
 router.post("/billupdate", (req, res) => {
+  let ts = Date.now();
+
+  let date_ob = new Date(ts);
+  let dat = date_ob.getDate();
+  let month = date_ob.getMonth() + 1;
+  let year = date_ob.getFullYear();
   var customerName = req.body.customerName;
+  var title = req.body.title;
+  var product = req.body.product;
+  var totAmt = req.body.totAmt;
+  var date = dat + "-" + month + "-" + year;
+  var paid = req.body.paid;
+  var due = req.body.due;
   Bill.findOneAndUpdate(
     { customerName: customerName },
     {
-      customerName: req.body.customerName,
-      title: req.body.title,
-      product: req.body.product,
-      totAmount: req.body.totAmt,
-      date: date + "-" + month + "-" + year,
-      paid: req.body.paid,
-      due: req.body.due
+      customerName: customerName,
+      title: title,
+      product: product,
+      totAmount: totAmt,
+      date: date,
+      paid: paid,
+      due: due
     },
     (err, bill) => {
       if (err) {
@@ -76,6 +88,17 @@ router.post("/billupdate", (req, res) => {
       }
     }
   );
+});
+
+router.post("/getbillbyid", (req, res) => {
+  var id = req.body.id;
+  Bill.findById(id, function(err, bill) {
+    if (err) {
+      res.status(500).json({ success: false, msg: err });
+    } else {
+      res.json({ success: true, msg: bill });
+    }
+  });
 });
 
 module.exports = router;
