@@ -23,7 +23,8 @@ router.post("/savebill", (req, res) => {
     totAmount: req.body.totAmt,
     date: date + "-" + month + "-" + year,
     paid: req.body.paid,
-    due: req.body.due
+    due: req.body.due,
+    tac: req.body.tac
   });
   bill.save(err => {
     if (err) {

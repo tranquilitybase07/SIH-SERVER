@@ -42,3 +42,19 @@ module.exports.addClient = function(newClient, callback) {
     });
   });
 };
+
+module.exports.getUserById = function(id, callback) {
+  Client.findById(id, callback);
+};
+
+module.exports.getUserByUsername = function(email, callback) {
+  const query = { email: email };
+  Client.findOne(query, callback);
+};
+
+module.exports.comparePassword = function(candidatePassword, hash, callback) {
+  bcrypt.compare(candidatePassword, hash, function(err, isMatch) {
+    if (err) throw err;
+    callback(null, isMatch);
+  });
+};
