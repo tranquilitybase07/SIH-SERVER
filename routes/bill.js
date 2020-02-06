@@ -1,8 +1,54 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const router = express.Router();
-
+const stripe = require('stripe')('sk_test_CgOgPfmRPiuCpYZWXUHfXbcf00OLNaUBlI');
+const uuid = require('uuid/v4');
 const Bill = require("../models/billmod");
+
+router.post('/paybill', async (req, res) => {
+  const { token, billInfo } = req.body;
+  try {
+    const customer = await stripe.customers.create({
+      email: token.email,
+      source: token.id
+    })
+    const idempotency_key = uuid();
+
+    const charge = await stripe.charges.create({
+      amount: billInfo.due * 100,
+      currency: "inr",
+      customer: customer.id,
+      receipt_email: token.email,
+      description: "Testing STripe",
+
+    }, { idempotency_key });
+    if (charge) {
+      Bill.findByIdAndUpdate(billInfo._id, { due: 0 }, (err, data) => {
+        if (err) {
+          console.log(err);
+          res.status(400).send({
+            status: 'failure'
+          })
+        } else {
+          console.log('Txn Succesfull : ', { charge });
+          res.status(201).send({
+            status: 'success',
+            data
+          })
+        }
+      })
+    }
+
+  }
+  catch (error) {
+    console.error('Txn Faliure : ', error);
+    res.status(400).send({
+      status: 'faliure'
+    })
+  }
+
+})
+
 
 router.post("/savebill", (req, res) => {
   // current timestamp in milliseconds
@@ -102,7 +148,17 @@ router.post("/getbillbyid", (req, res) => {
     }
   });
 });
-
+router.post("/getbill-custid", (req, res) => {
+  console.log(req.body.custid)
+  var id = req.body.custid;
+  Bill.find({ customer_id: id }, function (err, bill) {
+    if (err) {
+      res.status(500).json({ success: false, msg: err });
+    } else {
+      res.json({ success: true, msg: bill });
+    }
+  });
+});
 router.post("/deleteAllbill", (req, res) => {
   Bill.deleteMany({}, err => {
     if (err) {
