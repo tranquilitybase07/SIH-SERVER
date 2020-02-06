@@ -102,4 +102,14 @@ router.post("/getbillbyid", (req, res) => {
   });
 });
 
+router.post("/deleteAllbill", (req, res) => {
+  Bill.deleteMany({}, err => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.status(400).send("deleted");
+    }
+  });
+});
+
 module.exports = router;

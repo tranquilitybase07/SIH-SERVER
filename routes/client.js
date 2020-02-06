@@ -108,4 +108,14 @@ router.post("/deleteclient", (req, res) => {
   });
 });
 
+router.post("/deleteAllclient", (req, res) => {
+  Client.deleteMany({}, err => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.status(400).send("deleted");
+    }
+  });
+});
+
 module.exports = router;
