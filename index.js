@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const cors = require("cors");
+
 
 mongoose
   .connect(
@@ -15,6 +17,7 @@ mongoose
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors());
 
 const auth = require("./routes/auth");
 app.use("/auth", auth);
@@ -24,6 +27,9 @@ app.use("/bill", bill);
 
 const client = require("./routes/client");
 app.use("/client", client);
+
+const middle = require("./routes/middle");
+app.use("/middle", middle);
 
 const port = process.env.PORT || 5000;
 

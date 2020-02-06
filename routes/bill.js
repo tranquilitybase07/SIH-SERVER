@@ -24,7 +24,8 @@ router.post("/savebill", (req, res) => {
     date: date + "-" + month + "-" + year,
     paid: req.body.paid,
     due: req.body.due,
-    tac: req.body.tac
+    tac: req.body.tac,
+    customer_id: req.body.customer_id
   });
   bill.save(err => {
     if (err) {
@@ -93,7 +94,7 @@ router.post("/billupdate", (req, res) => {
 
 router.post("/getbillbyid", (req, res) => {
   var id = req.body.id;
-  Bill.findById(id, function(err, bill) {
+  Bill.findById(id, function (err, bill) {
     if (err) {
       res.status(500).json({ success: false, msg: err });
     } else {

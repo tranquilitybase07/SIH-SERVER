@@ -24,12 +24,12 @@ router.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   console.log(req.body.email, req.body.password);
-  User.getUserByUsername(email, function(err, user) {
+  User.getUserByUsername(email, function (err, user) {
     if (err) throw err;
     if (!user) {
       return res.json({ success: false, msg: "User not found" });
     }
-    User.comparePassword(password, user.password, function(err, isMatch) {
+    User.comparePassword(password, user.password, function (err, isMatch) {
       if (err) throw err;
       if (isMatch) {
         const token = jwt.sign(user.toJSON(), "secret", {
@@ -50,5 +50,30 @@ router.post("/login", (req, res) => {
     });
   });
 });
+
+router.post("/register", (req, res) => {
+  let newUser = new User({
+    name: req.body.name,
+    email: req.body.email,
+    username: req.body.username,
+    password: req.body.password
+  });
+  User.addUser(newUser, err => {
+    if (err) {
+      res.json({ sucsess: false, msg: err });
+    } else {
+      res.json({ sucsess: true, msg: newUser });
+    }
+  });
+});
+router.post("/get-alluser", (req, res) => {
+  User.find({}, (err, data) => {
+    if (err) {
+      res.status(400).send({ success: false, msg: err })
+    } else {
+      res.status(200).send({ success: true, msg: data })
+    }
+  })
+})
 
 module.exports = router;
